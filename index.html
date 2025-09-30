@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dino Math Fun</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', sans-serif;
+    background-color: #f0f8ff;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 { color: #2e8b57; }
+  #question { font-size: 2em; margin: 20px; }
+  button {
+    font-size: 1.5em;
+    margin: 10px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  #score { font-size: 1.5em; margin: 15px; }
+  #fireworks {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    pointer-events:none;
+    z-index: 9999;
+  }
+  .dino {
+    width: 80px;
+    vertical-align: middle;
+  }
+  #menu button { display: block; margin: 20px auto; width: 60%; }
+</style>
+</head>
+<body>
+
+<h1>Dino Math Fun 🦖</h1>
+<div id="score">Score: 0</div>
+<div id="question">Choose a game to start!</div>
+<div id="buttons" id="menu"></div>
+<canvas id="fireworks"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+const questions = [];
+const scoreElement = document.getElementById('score');
+const questionElement = document.getElementById('question');
+const buttonsElement = document.getElementById('buttons');
+
+let score = 0;
+let currentQuestionIndex = 0;
+let currentGame = '';
+
+const dinos = [
+  "https://i.imgur.com/3u8sVQO.png",
+  "https://i.imgur.com/6R5gZYo.png",
+  "https://i.imgur.com/HMtbD9S.png"
+];
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function ordinal(n) {
+  if(n===1) return "st";
+  if(n===2) return "nd";
+  if(n===3) return "rd";
+  return "th";
+}
+
+function generateQuestions(game){
+  questions.length = 0;
+  if(game==='countForward'){
+    for(let i=1;i<=50;i++) questions.push({text:`Click the number ${i} 🦖`, answer: i});
+  } else if(game==='countBackward'){
+    for(let i=20;i>=1;i--) questions.push({text:`Click the number ${i} 🦖`, answer:i});
+  } else if(game==='skipCount'){
+    [2,5,10].forEach(step=>{for(let i=0;i<=50;i+=step){if(i>0) questions.push({text:`Click the number ${i} (skip by ${step}) 🦖`, answer:i});}});
+  } else if(game==='compare'){
+    for(let i=1;i<=10;i++){
+      const a=randomInt(1,10), b=randomInt(1,10);
+      questions.push({text:`Which is bigger? ${a} or ${b} 🦖`, answer:Math.max(a,b)});
+      questions.push({text:`Which is smaller? ${a} or ${b} 🦖`, answer:Math.min(a,b)});
+    }
+  } else if(game==='ordinal'){
+    for(let i=1;i<=10;i++) questions.push({text:`Which number is ${i}${ordinal(i)} 🦖`, answer:i});
+  }
+  currentQuestionIndex = 0;
+  score = 0;
+  scoreElement.textContent = `Score: ${score}`;
+  showQuestion();
+}
+
+function showMenu(){
+  questionElement.textContent = "Select a game:";
+  buttonsElement.innerHTML = '';
+  const games = [
+    {name:'Count Forward', id:'countForward'},
+    {name:'Count Backward', id:'countBackward'},
+    {name:'Skip Counting', id:'skipCount'},
+    {name:'Compare Numbers', id:'compare'},
+    {name:'Ordinal Numbers', id:'ordinal'}
+  ];
+  games.forEach(game=>{
+    const btn = document.createElement('button');
+    btn.textContent = game.name;
+    btn.onclick = ()=>{ currentGame = game.id; generateQuestions(currentGame); };
+    buttonsElement.appendChild(btn);
+  });
+}
+
+function showQuestion() {
+  if(currentQuestionIndex >= questions.length){
+    questionElement.textContent = "🎉 All done! Great job!";
+    buttonsElement.innerHTML = "";
+    setTimeout(showMenu, 2000);
+    return;
+  }
+  const q = questions[currentQuestionIndex];
+  questionElement.innerHTML = q.text;
+  const options = new Set();
+  options.add(q.answer);
+  while(options.size<3) options.add(randomInt(1, Math.max(q.answer+5, 10)));
+  buttonsElement.innerHTML = "";
+  Array.from(options).sort(()=>Math.random()-0.5).forEach(opt=>{
+    const btn = document.createElement("button");
+    const dino = dinos[randomInt(0,dinos.length-1)];
+    btn.innerHTML = `<img src="${dino}" class="dino"> ${opt}`;
+    btn.onclick = ()=>checkAnswer(opt);
+    buttonsElement.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected){
+  const correct = questions[currentQuestionIndex].answer;
+  if(selected===correct){
+    score++;
+    confetti({particleCount:100, spread:70, origin:{y:0.6}});
+  } else score = Math.max(0, score-1);
+  scoreElement.textContent = `Score: ${score}`;
+  currentQuestionIndex++;
+  showQuestion();
+}
+
+showMenu();
+</script>
+</body>
+</html>
