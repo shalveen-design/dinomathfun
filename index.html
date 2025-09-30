@@ -32,7 +32,7 @@
     width: 80px;
     vertical-align: middle;
   }
-  #menu button { display: block; margin: 20px auto; width: 60%; }
+  #buttons button { display: block; margin: 20px auto; width: 60%; }
 </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
 <h1>Dino Math Fun 🦖</h1>
 <div id="score">Score: 0</div>
 <div id="question">Choose a game to start!</div>
-<div id="buttons" id="menu"></div>
+<div id="buttons"></div>
 <canvas id="fireworks"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -55,9 +55,9 @@ let currentQuestionIndex = 0;
 let currentGame = '';
 
 const dinos = [
-  "https://i.imgur.com/3u8sVQO.png",
-  "https://i.imgur.com/6R5gZYo.png",
-  "https://i.imgur.com/HMtbD9S.png"
+  "https://upload.wikimedia.org/wikipedia/commons/3/32/Tyrannosaurus_Rex_Holotype.png",
+  "https://upload.wikimedia.org/wikipedia/commons/e/e2/Triceratops_BW.png",
+  "https://upload.wikimedia.org/wikipedia/commons/4/4f/Stegosaurus_BW.png"
 ];
 
 function randomInt(min, max) {
